@@ -1,0 +1,199 @@
+-- Trade Freezer by Aura | Versiune Curată & Fixată
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+
+if CoreGui:FindFirstChild("TradeFreezerByAura") then
+    CoreGui.TradeFreezerByAura:Destroy()
+end
+
+local sg = Instance.new("ScreenGui")
+sg.Name = "TradeFreezerByAura"
+sg.IgnoreGuiInset = true
+sg.ResetOnSpawn = false
+sg.Parent = CoreGui
+
+-- Main Frame
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 380, 0, 235)
+main.Position = UDim2.new(0.5, -190, 0.5, -120)
+main.AnchorPoint = Vector2.new(0.5, 0.5)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+main.BackgroundTransparency = 0.25
+main.Active = true
+main.Draggable = true
+main.Parent = sg
+
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 16)
+
+-- Gradient Border
+local stroke = Instance.new("UIStroke", main)
+stroke.Thickness = 2.3
+stroke.Color = Color3.fromRGB(255, 255, 255)
+
+local gradient = Instance.new("UIGradient", stroke)
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,255,255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(80,80,90)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255,255,255))
+}
+
+RunService.RenderStepped:Connect(function()
+    gradient.Rotation += 1.4
+end)
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 48)
+title.BackgroundTransparency = 1
+title.Text = "Trade Freezer by Aura"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 23
+title.Parent = main
+
+-- Countdown Label
+local countdownLabel = Instance.new("TextLabel")
+countdownLabel.Size = UDim2.new(1, -40, 0, 32)
+countdownLabel.Position = UDim2.new(0, 20, 0, 50)
+countdownLabel.BackgroundTransparency = 1
+countdownLabel.TextColor3 = Color3.fromRGB(180, 180, 190)
+countdownLabel.Font = Enum.Font.Gotham
+countdownLabel.TextSize = 14.5
+countdownLabel.TextWrapped = true
+countdownLabel.Parent = main
+
+-- Floating Particles (doar în frame)
+local particles = {}
+for i = 1, 16 do
+    local p = Instance.new("Frame")
+    p.Size = UDim2.new(0, 5, 0, 5)
+    p.BackgroundColor3 = Color3.fromRGB(140, 150, 255)
+    p.BackgroundTransparency = 0.75
+    p.BorderSizePixel = 0
+    p.Parent = main
+    Instance.new("UICorner", p).CornerRadius = UDim.new(1, 0)
+    
+    particles[i] = {frame = p, speed = math.random(8,16)/10, offset = math.random()*200}
+end
+
+RunService.RenderStepped:Connect(function(dt)
+    for _, p in ipairs(particles) do
+        p.offset += dt * p.speed
+        local x = 25 + math.sin(p.offset) * (main.AbsoluteSize.X - 50)
+        local y = 90 + math.cos(p.offset * 0.8) * (main.AbsoluteSize.Y - 140)
+        p.frame.Position = UDim2.new(0, x, 0, y)
+    end
+end)
+
+-- ==================== TOGGLES ====================
+local function createToggle(name, yPos)
+    local cont = Instance.new("Frame")
+    cont.Size = UDim2.new(1, -40, 0, 52)
+    cont.Position = UDim2.new(0, 20, 0, yPos)
+    cont.BackgroundTransparency = 1
+    cont.Parent = main
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0.58, 0, 1, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = name
+    lbl.TextColor3 = Color3.fromRGB(230, 230, 240)
+    lbl.Font = Enum.Font.GothamSemibold
+    lbl.TextSize = 18
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = cont
+
+    local togBg = Instance.new("Frame")
+    togBg.Size = UDim2.new(0, 86, 0, 40)
+    togBg.Position = UDim2.new(1, -96, 0.5, -20)
+    togBg.AnchorPoint = Vector2.new(0, 0.5)
+    togBg.BackgroundColor3 = Color3.fromRGB(48, 48, 53)
+    togBg.Parent = cont
+    Instance.new("UICorner", togBg).CornerRadius = UDim.new(1, 0)
+
+    local knob = Instance.new("Frame")
+    knob.Size = UDim2.new(0, 34, 0, 34)
+    knob.Position = UDim2.new(0, 3, 0.5, -17)
+    knob.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+    knob.Parent = togBg
+    Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+
+    local enabled = false
+
+    local function update()
+        local pos = enabled and UDim2.new(1, -37, 0.5, -17) or UDim2.new(0, 3, 0.5, -17)
+        local col = enabled and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(255, 70, 70)
+        TweenService:Create(knob, TweenInfo.new(0.25, Enum.EasingStyle.Quint), {Position = pos}):Play()
+        TweenService:Create(knob, TweenInfo.new(0.25), {BackgroundColor3 = col}):Play()
+    end
+
+    togBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            enabled = not enabled
+            update()
+
+            if name == "Freeze Trade" and enabled then
+                showCountdownMenu()
+            end
+        end
+    end)
+end
+
+-- Countdown Menu
+local function showCountdownMenu()
+    local gui = Instance.new("ScreenGui")
+    gui.ResetOnSpawn = false
+    gui.DisplayOrder = 999
+    gui.Parent = CoreGui
+
+    local box = Instance.new("Frame")
+    box.Size = UDim2.new(0, 290, 0, 130)
+    box.Position = UDim2.new(0.5, -145, 0.5, -65)
+    box.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    box.Parent = gui
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 12)
+
+    local txt = Instance.new("TextLabel")
+    txt.Size = UDim2.new(1, -30, 0, 40)
+    txt.Position = UDim2.new(0, 15, 0, 20)
+    txt.BackgroundTransparency = 1
+    txt.Text = "Please wait"
+    txt.TextColor3 = Color3.fromRGB(255, 255, 255)
+    txt.Font = Enum.Font.GothamSemibold
+    txt.TextSize = 20
+    txt.Parent = box
+
+    local count = Instance.new("TextLabel")
+    count.Size = UDim2.new(1, -30, 0, 50)
+    count.Position = UDim2.new(0, 15, 0, 60)
+    count.BackgroundTransparency = 1
+    count.Text = "35"
+    count.TextColor3 = Color3.fromRGB(0, 255, 100)
+    count.Font = Enum.Font.GothamBold
+    count.TextSize = 50
+    count.Parent = box
+
+    local timeLeft = 35
+    local conn = RunService.Heartbeat:Connect(function(dt)
+        timeLeft = timeLeft - dt
+        count.Text = math.ceil(timeLeft)
+
+        if timeLeft <= 0 then
+            conn:Disconnect()
+            gui:Destroy()
+        end
+    end)
+end
+
+-- Create Toggles
+createToggle("Freeze Trade", 95)
+createToggle("Auto Accept", 158)
+
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
+
+print("Trade Freezer by Aura loaded!")
