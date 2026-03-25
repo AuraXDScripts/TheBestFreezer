@@ -172,7 +172,7 @@ local function showCountdownMenu()
     count.Size = UDim2.new(1, -30, 0, 50)
     count.Position = UDim2.new(0, 15, 0, 60)
     count.BackgroundTransparency = 1
-    count.Text = "35"
+    count.Text = "Please Wait a bit after executing"
     count.TextColor3 = Color3.fromRGB(0, 255, 100)
     count.Font = Enum.Font.GothamBold
     count.TextSize = 50
