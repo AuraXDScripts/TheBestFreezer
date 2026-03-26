@@ -1,4 +1,4 @@
--- Trade Freezer by Aura | Versiune Curată & Fixată
+-- Trade Freezer by Aura | Centrat + Curat + Fără Particule
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
@@ -17,10 +17,10 @@ sg.IgnoreGuiInset = true
 sg.ResetOnSpawn = false
 sg.Parent = CoreGui
 
--- Main Frame
+-- Main Frame (centrat perfect)
 local main = Instance.new("Frame")
 main.Size = UDim2.new(0, 380, 0, 235)
-main.Position = UDim2.new(0.5, -190, 0.5, -120)
+main.Position = UDim2.new(0.5, 0, 0.5, 0)      -- centrat perfect
 main.AnchorPoint = Vector2.new(0.5, 0.5)
 main.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 main.BackgroundTransparency = 0.25
@@ -56,39 +56,17 @@ title.Font = Enum.Font.GothamBlack
 title.TextSize = 23
 title.Parent = main
 
--- Countdown Label
-local countdownLabel = Instance.new("TextLabel")
-countdownLabel.Size = UDim2.new(1, -40, 0, 32)
-countdownLabel.Position = UDim2.new(0, 20, 0, 50)
-countdownLabel.BackgroundTransparency = 1
-countdownLabel.TextColor3 = Color3.fromRGB(180, 180, 190)
-countdownLabel.Font = Enum.Font.Gotham
-countdownLabel.TextSize = 14.5
-countdownLabel.TextWrapped = true
-countdownLabel.Parent = main
-
--- Floating Particles (doar în frame)
-local particles = {}
-for i = 1, 16 do
-    local p = Instance.new("Frame")
-    p.Size = UDim2.new(0, 5, 0, 5)
-    p.BackgroundColor3 = Color3.fromRGB(140, 150, 255)
-    p.BackgroundTransparency = 0.75
-    p.BorderSizePixel = 0
-    p.Parent = main
-    Instance.new("UICorner", p).CornerRadius = UDim.new(1, 0)
-    
-    particles[i] = {frame = p, speed = math.random(8,16)/10, offset = math.random()*200}
-end
-
-RunService.RenderStepped:Connect(function(dt)
-    for _, p in ipairs(particles) do
-        p.offset += dt * p.speed
-        local x = 25 + math.sin(p.offset) * (main.AbsoluteSize.X - 50)
-        local y = 90 + math.cos(p.offset * 0.8) * (main.AbsoluteSize.Y - 140)
-        p.frame.Position = UDim2.new(0, x, 0, y)
-    end
-end)
+-- Text sub titlu (exact cum ai cerut)
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Size = UDim2.new(1, -40, 0, 32)
+infoLabel.Position = UDim2.new(0, 20, 0, 50)
+infoLabel.BackgroundTransparency = 1
+infoLabel.Text = "You will have to wait 35 seconds before trading"
+infoLabel.TextColor3 = Color3.fromRGB(180, 180, 190)
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextSize = 14.5
+infoLabel.TextWrapped = true
+infoLabel.Parent = main
 
 -- ==================== TOGGLES ====================
 local function createToggle(name, yPos)
@@ -136,7 +114,6 @@ local function createToggle(name, yPos)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             enabled = not enabled
             update()
-
             if name == "Freeze Trade" and enabled then
                 showCountdownMenu()
             end
@@ -172,10 +149,10 @@ local function showCountdownMenu()
     count.Size = UDim2.new(1, -30, 0, 50)
     count.Position = UDim2.new(0, 15, 0, 60)
     count.BackgroundTransparency = 1
-    count.Text = "Please Wait a bit after executing"
+    count.Text = "35"
     count.TextColor3 = Color3.fromRGB(0, 255, 100)
     count.Font = Enum.Font.GothamBold
-    count.TextSize = 50
+    count.TextSize = 48
     count.Parent = box
 
     local timeLeft = 35
